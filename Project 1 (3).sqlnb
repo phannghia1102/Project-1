@@ -48,198 +48,6 @@ cells:
 
       </small>"
     languageId: markdown
-  - kind: 2
-    value: "SELECT\r
-
-      \    a.INDUSTRY,\r
-
-      \    COUNT(*) AS total_opportunities,\r
-
-      \    SUM(CASE WHEN o.STAGE = 'Closed Won' THEN 1 ELSE 0 END) AS
-      won_opportunities,\r
-
-      \    SUM(CASE WHEN o.STAGE = 'Closed Lost' THEN 1 ELSE 0 END) AS
-      lost_opportunities,\r
-
-      \    ROUND(\r
-
-      \        SUM(CASE WHEN o.STAGE = 'Closed Won' THEN 1 ELSE 0 END) * 100.0 /
-      COUNT(*),\r
-
-      \        1\r
-
-      \    ) AS win_rate_pct\r
-
-      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY o\r
-
-      JOIN DATABASE_FUNDAMENTALS.ACCOUNT a\r
-
-      \    ON o.ACCOUNT_ID = a.ACCOUNT_ID\r
-
-      GROUP BY a.INDUSTRY\r
-
-      ORDER BY win_rate_pct DESC;\r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 1. Row count for OPPORTUNITY\r
-
-      -- ============================================\r
-
-      SELECT COUNT(*) AS opportunity_rows FROM
-      DATABASE_FUNDAMENTALS.OPPORTUNITY;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 2. Row count for ACCOUNT\r
-
-      -- ============================================\r
-
-      SELECT COUNT(*) AS account_rows FROM DATABASE_FUNDAMENTALS.ACCOUNT;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 3. Duplicate check: OPPORTUNITY_ID\r
-
-      -- (If this returns 0 rows, there are NO duplicates)\r
-
-      -- ============================================\r
-
-      SELECT OPPORTUNITY_ID, COUNT(*)\r
-
-      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
-
-      GROUP BY OPPORTUNITY_ID\r
-
-      HAVING COUNT(*) > 1;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 4. Duplicate check: ACCOUNT_ID\r
-
-      -- (If this returns 0 rows, there are NO duplicates)\r
-
-      -- ============================================\r
-
-      SELECT ACCOUNT_ID, COUNT(*)\r
-
-      FROM DATABASE_FUNDAMENTALS.ACCOUNT\r
-
-      GROUP BY ACCOUNT_ID\r
-
-      HAVING COUNT(*) > 1;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 5. Null counts for OPPORTUNITY columns that allow nulls\r
-
-      -- (CLOSED_WON_REASON, PUSH_COUNT, AGE)\r
-
-      -- ============================================\r
-
-      SELECT\r
-
-      \    SUM(CASE WHEN CLOSED_WON_REASON IS NULL THEN 1 ELSE 0 END) AS
-      null_closed_won_reason,\r
-
-      \    SUM(CASE WHEN PUSH_COUNT IS NULL THEN 1 ELSE 0 END) AS
-      null_push_count,\r
-
-      \    SUM(CASE WHEN AGE IS NULL THEN 1 ELSE 0 END) AS null_age\r
-
-      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 6. Null counts for ACCOUNT columns used in your analysis\r
-
-      -- (INDUSTRY is the one you actually use for Q1)\r
-
-      -- ============================================\r
-
-      SELECT\r
-
-      \    SUM(CASE WHEN INDUSTRY IS NULL THEN 1 ELSE 0 END) AS null_industry,\r
-
-      \    SUM(CASE WHEN ANNUAL_REVENUE IS NULL THEN 1 ELSE 0 END) AS
-      null_annual_revenue,\r
-
-      \    SUM(CASE WHEN REGION IS NULL THEN 1 ELSE 0 END) AS null_region,\r
-
-      \    SUM(CASE WHEN COUNTRY IS NULL THEN 1 ELSE 0 END) AS null_country\r
-
-      FROM DATABASE_FUNDAMENTALS.ACCOUNT;\r
-
-      \r
-
-      \r
-
-      -- ============================================\r
-
-      -- 7. Date range for OPPORTUNITY\r
-
-      -- ============================================\r
-
-      SELECT\r
-
-      \    MIN(CREATED_DATE) AS earliest_created,\r
-
-      \    MAX(CREATED_DATE) AS latest_created,\r
-
-      \    MIN(CLOSED_DATE) AS earliest_closed,\r
-
-      \    MAX(CLOSED_DATE) AS latest_closed\r
-
-      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY;\r\n"
-    languageId: oracle-sql
   - kind: 1
     value: "#### **S - Specify the question**\r
 
@@ -362,16 +170,20 @@ cells:
 
       <b>Analytical question #1</b><br>\r
 
-      <b>Question:</b> [Your analytical question.]<br>\r
+      <b>Question:</b> Do multi-product opportunities differ from single-product
+      opportunities in historical win rate and completed sales-cycle
+      duration<br>\r
 
-      <b>Relevant KPI or comparison:</b> [State the metric or comparison that
-      will answer this question.]<br>\r
+      <b>Relevant KPI or comparison:</b> Completed opportunity count, historical
+      win rate, and median completed sales-cycle duration for single-product
+      versus multi-product<br>\r
 
-      <b>Relevance:</b> [How the analytical question is relevant to the primary
-      business question.]<br>\r
+      <b>Relevance:</b> This analysis evaluates whether there are differences
+      between single and multi product opportunities, which would answer the
+      ultimate business question of: \"how much benefit is there from
+      product-mix\"<br>\r
 
-      <b>Tableau workbook sheet name:</b> [Insert the Tableau workbook sheet
-      name associated with exploring and answering this analytical.]\r
+      <b>Tableau workbook sheet name:</b> Single vs Multi-product Outcomes\r
 
       </small>"
     languageId: markdown
@@ -390,7 +202,111 @@ cells:
 
       */\r
 
-      -- Place your query below this line.\r\n"
+      -- Place your query below this line.\r
+
+      WITH product_counts AS (\r
+
+      \    SELECT\r
+
+      \        opportunity_id,\r
+
+      \        COUNT(DISTINCT product_id) AS distinct_product_count\r
+
+      \    FROM database_fundamentals.opportunity_line_item\r
+
+      \    GROUP BY opportunity_id\r
+
+      )\r
+
+      \r
+
+      SELECT\r
+
+      \    CASE\r
+
+      \        WHEN pc.distinct_product_count = 1 THEN 'Single-product'\r
+
+      \        ELSE 'Multi-product'\r
+
+      \    END AS product_group,\r
+
+      \r
+
+      \    COUNT(*) AS total_opportunities,\r
+
+      \r
+
+      \    SUM(\r
+
+      \        CASE\r
+
+      \            WHEN o.stage = 'Closed Won' THEN 1\r
+
+      \            ELSE 0\r
+
+      \        END\r
+
+      \    ) AS won_opportunities,\r
+
+      \r
+
+      \    SUM(\r
+
+      \        CASE\r
+
+      \            WHEN o.stage = 'Closed Lost' THEN 1\r
+
+      \            ELSE 0\r
+
+      \        END\r
+
+      \    ) AS lost_opportunities,\r
+
+      \r
+
+      \    ROUND(\r
+
+      \        100.0 *\r
+
+      \        SUM(CASE WHEN o.stage = 'Closed Won' THEN 1 ELSE 0 END)\r
+
+      \        / COUNT(*),\r
+
+      \        2\r
+
+      \    ) AS win_rate_pct,\r
+
+      \r
+
+      \    MEDIAN(o.age) AS median_cycle_days\r
+
+      \r
+
+      FROM database_fundamentals.opportunity o\r
+
+      JOIN product_counts pc\r
+
+      \    ON o.opportunity_id = pc.opportunity_id\r
+
+      \r
+
+      WHERE o.stage IN ('Closed Won', 'Closed Lost')\r
+
+      \r
+
+      GROUP BY\r
+
+      \    CASE\r
+
+      \        WHEN pc.distinct_product_count = 1 THEN 'Single-product'\r
+
+      \        ELSE 'Multi-product'\r
+
+      \    END\r
+
+      \r
+
+      ORDER BY product_group;\r\n"
     languageId: oracle-sql
   - kind: 1
     value: "<small>\r
@@ -398,7 +314,16 @@ cells:
       <b>Anticipated data limitations relevant to your analytical
       questions</b><br>\r
 
-      [Anticipated data limitations]\r
+      Since the analysis is limited to historical opportunities, differences
+      between industries or between single- and multi-product opportunities can
+      only be interpreted as associations rather than causation. Industry-level
+      comparisons, because of their large scope, may mitigate the effects of
+      individual accounts, regions, or types of opportunities. Similarly,
+      organizing opportunities as either single- or multi-product opportunities
+      does not capture the nuances of product combinations or specific products.
+      The sizes of the groups between single- and multi-product opportunities
+      were also different, becoming another obstacle to making a precise
+      comparison.\r
 
       <small>"
     languageId: markdown
@@ -528,10 +453,10 @@ cells:
 
       <b>Primary key:</b> OPPORTUNITY_ID<br>\r
 
-      <b>Foreign key(s):</b> ACCOUNT_ID, OWNER_ID<br>\r
+      <b>Foreign key(s):</b> ACCOUNT_ID, OWNER_ID, BUSINESS_UNIT_ID<br>\r
 
-      <b>Relationship(s):</b> Many-to-one relationship with the ACCOUNT
-      table.<br>\r
+      <b>Relationship(s):</b> Many-to-one relationships with the ACCOUNT, OWNER,
+      and BUSINESS_UNIT tables.<br>\r
 
       <b>Number of rows:</b> 500,000<br>\r
 
@@ -543,8 +468,6 @@ cells:
       closed: 09-FEB-23, Max closed: 07-FEB-26\r
 
       \r
-
-      <br><br>\r
 
       \r
 
@@ -569,61 +492,58 @@ cells:
 
       <b>Date-range:</b> Not applicable\r
 
-      </small>\r
+      \r
 
       \r
 
-      <b>Fully qualified table 1 name</b><br>\r
+      <b>Fully qualified table 3 name:</b>
+      DATABASE_FUNDAMENTALS.OPPORTUNITY_LINE_ITEM<br>\r
 
-      <b>Grain:</b> [How the KPI is calculated in plain-English.]<br>\r
+      <b>Grain:</b> Each row represents one product line item within a sales
+      opportunity.<br>\r
 
-      <b>Primary key:</b> [The primary key of the table.]<br>\r
+      <b>Primary key:</b> Composite primary key consisting of OPPORTUNITY_ID and
+      OPPORTUNITY_LINE_ITEM_ID<br>\r
 
-      <b>Foreign key(s):</b> [The fields serving as foreign keys within the
-      table, if applicable. Populate this section with \"Not applicable\" if no
-      foreign keys exist within the table.]<br>\r
+      <b>Foreign key(s):</b> OPPORTUNITY_ID references
+      OPPORTUNITY.OPPORTUNITY_ID; PRODUCT_ID references PRODUCT.PRODUCT_ID<br>\r
 
-      <b>Relationship(s):</b> [How the KPI is calculated in
-      plain-English.]<br>\r
+      <b>Relationship(s):</b> Many opportunity line items can belong to one
+      opportunity, and many opportunity line items can reference one
+      product.<br>\r
 
-      <b>Number of rows:</b> [The number of rows within the table.]<br>\r
+      <b>Number of rows:</b> 1,500,340<br>\r
 
-      <b>Number of duplicates:</b> [The number of duplicates identified within
-      the table.]<br>\r
+      <b>Number of duplicates:</b> 0<br>\r
 
-      <b>Number of nulls:</b> [The number of nulls for each field used for your
-      analysis.]<br>\r
+      <b>Number of nulls:</b> OPPORTUNITY_ID: 0, OPPORTUNITY_LINE_ITEM_ID: 0,
+      PRODUCT_ID: 0, QUANTITY: 0<br>\r
 
-      <b>Date-range:</b> [The minimum and maximum date of data available within
-      a table. If a table does not contain a date field, populate with \"Not
-      applicable.\"]\r
+      <b>Date-range:</b> Not applicable\r
 
       \r
 
-      <b>Fully qualified table 1 name</b><br>\r
+      \r
 
-      <b>Grain:</b> [How the KPI is calculated in plain-English.]<br>\r
+      <b>Fully qualified table 4 name:</b> DATABASE_FUNDAMENTALS.PRODUCT<br>\r
 
-      <b>Primary key:</b> [The primary key of the table.]<br>\r
+      <b>Grain:</b> Each row represents one product in the company's product
+      catalog.<br>\r
 
-      <b>Foreign key(s):</b> [The fields serving as foreign keys within the
-      table, if applicable. Populate this section with \"Not applicable\" if no
-      foreign keys exist within the table.]<br>\r
+      <b>Primary key:</b> PRODUCT_ID<br>\r
 
-      <b>Relationship(s):</b> [How the KPI is calculated in
-      plain-English.]<br>\r
+      <b>Foreign key(s):</b> Not applicable<br>\r
 
-      <b>Number of rows:</b> [The number of rows within the table.]<br>\r
+      <b>Relationship(s):</b> One-to-many relationship with the
+      OPPORTUNITY_LINE_ITEM table.<br>\r
 
-      <b>Number of duplicates:</b> [The number of duplicates identified within
-      the table.]<br>\r
+      <b>Number of rows:</b> 20<br>\r
 
-      <b>Number of nulls:</b> [The number of nulls for each field used for your
-      analysis.]<br>\r
+      <b>Number of duplicates:</b> 0<br>\r
 
-      <b>Date-range:</b> [The minimum and maximum date of data available within
-      a table. If a table does not contain a date field, populate with \"Not
-      applicable.\"]\r
+      <b>Number of nulls:</b> PRODUCT_ID: 0, NAME: 0, PRICE: 0<br>\r
+
+      <b>Date-range:</b> Not applicable\r
 
       </small>"
     languageId: markdown
@@ -712,11 +632,27 @@ cells:
 
       -- Your query here.\r
 
+      SELECT\r
+
+      \    COUNT(*) AS total_completed_opportunities\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage IN ('Closed Won', 'Closed Lost');\r
+
       \r
 
       -- Number of won opportunities\r
 
       -- Your query here.\r
+
+      SELECT\r
+
+      \    COUNT(*) AS won_opportunities\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage = 'Closed Won';\r
 
       \r
 
@@ -724,17 +660,39 @@ cells:
 
       -- Your query here.\r
 
+      SELECT\r
+
+      \    COUNT(*) AS lost_opportunities\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage = 'Closed Lost';\r
+
       \r
 
       -- Historical win rate\r
 
       -- Your query here.\r
 
-      \r
+      SELECT\r
 
-      -- Historical win rate\r
+      \    COUNT(*) AS total_opportunities,\r
 
-      -- Your query here.\r
+      \    SUM(CASE WHEN stage = 'Closed Won' THEN 1 ELSE 0 END) AS
+      won_opportunities,\r
+
+      \    ROUND(\r
+
+      \        100.0 * SUM(CASE WHEN stage = 'Closed Won' THEN 1 ELSE 0 END) /
+      COUNT(*),\r
+
+      \        2\r
+
+      \    ) AS win_rate_pct\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage IN ('Closed Won', 'Closed Lost');\r
 
       \r
 
@@ -742,11 +700,41 @@ cells:
 
       -- Your query here.\r
 
+      SELECT\r
+
+      \    COUNT(*) AS completed_opportunities,\r
+
+      \    ROUND(AVG(age), 2) AS avg_cycle_days,\r
+
+      \    MEDIAN(age) AS median_cycle_days\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage IN ('Closed Won', 'Closed Lost');\r
+
       \r
 
       -- Average and median completed sales-cycle duration by outcome\r
 
       -- Your query here.\r
+
+      SELECT\r
+
+      \    stage,\r
+
+      \    COUNT(*) AS completed_opportunities,\r
+
+      \    ROUND(AVG(age), 2) AS avg_cycle_days,\r
+
+      \    MEDIAN(age) AS median_cycle_days\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage IN ('Closed Won', 'Closed Lost')\r
+
+      GROUP BY stage\r
+
+      ORDER BY stage;\r
 
       \r
 
@@ -754,11 +742,110 @@ cells:
 
       -- Your query here.\r
 
+      SELECT\r
+
+      \    type,\r
+
+      \    COUNT(*) AS opportunity_count,\r
+
+      \    SUM(CASE WHEN stage = 'Closed Won' THEN 1 ELSE 0 END) AS
+      won_opportunities,\r
+
+      \    ROUND(\r
+
+      \        100.0 * SUM(CASE WHEN stage = 'Closed Won' THEN 1 ELSE 0 END) /
+      COUNT(*),\r
+
+      \        2\r
+
+      \    ) AS win_rate_pct\r
+
+      FROM DATABASE_FUNDAMENTALS.OPPORTUNITY\r
+
+      WHERE stage IN ('Closed Won', 'Closed Lost')\r
+
+      GROUP BY type\r
+
+      ORDER BY opportunity_count DESC;\r
+
       \r
 
       -- Product mix\r
 
       -- Your query here.\r
+
+      WITH opportunity_product AS (\r
+
+      \    SELECT\r
+
+      \        o.opportunity_id,\r
+
+      \        oli.product_id,\r
+
+      \        SUM(oli.quantity) AS product_quantity\r
+
+      \    FROM DATABASE_FUNDAMENTALS.OPPORTUNITY o\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.OPPORTUNITY_LINE_ITEM oli\r
+
+      \        ON o.opportunity_id = oli.opportunity_id\r
+
+      \    WHERE o.stage IN ('Closed Won', 'Closed Lost')\r
+
+      \    GROUP BY\r
+
+      \        o.opportunity_id,\r
+
+      \        oli.product_id\r
+
+      )\r
+
+      SELECT\r
+
+      \    p.name AS product_name,\r
+
+      \    COUNT(*) AS opportunities_with_product,\r
+
+      \    SUM(op.product_quantity) AS total_quantity\r
+
+      FROM opportunity_product op\r
+
+      JOIN DATABASE_FUNDAMENTALS.PRODUCT p\r
+
+      \    ON op.product_id = p.product_id\r
+
+      GROUP BY p.name\r
+
+      ORDER BY opportunities_with_product DESC;\r
+
+      \r
+
+      WITH opportunity_product_counts AS (\r
+
+      \    SELECT\r
+
+      \        o.opportunity_id,\r
+
+      \        COUNT(DISTINCT oli.product_id) AS distinct_product_count\r
+
+      \    FROM DATABASE_FUNDAMENTALS.OPPORTUNITY o\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.OPPORTUNITY_LINE_ITEM oli\r
+
+      \        ON o.opportunity_id = oli.opportunity_id\r
+
+      \    WHERE o.stage IN ('Closed Won', 'Closed Lost')\r
+
+      \    GROUP BY o.opportunity_id\r
+
+      )\r
+
+      SELECT\r
+
+      \    ROUND(AVG(distinct_product_count), 2) AS
+      avg_distinct_products_per_opportunity\r
+
+      FROM opportunity_product_counts;\r
 
       \r
 
@@ -766,11 +853,93 @@ cells:
 
       -- Your query here.\r
 
+      WITH opportunity_revenue AS (\r
+
+      \    SELECT\r
+
+      \        o.opportunity_id,\r
+
+      \        o.stage,\r
+
+      \        SUM(oli.quantity * p.price) AS opportunity_revenue\r
+
+      \    FROM DATABASE_FUNDAMENTALS.OPPORTUNITY o\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.OPPORTUNITY_LINE_ITEM oli\r
+
+      \        ON o.opportunity_id = oli.opportunity_id\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.PRODUCT p\r
+
+      \        ON oli.product_id = p.product_id\r
+
+      \    WHERE o.stage IN ('Closed Won', 'Closed Lost')\r
+
+      \    GROUP BY\r
+
+      \        o.opportunity_id,\r
+
+      \        o.stage\r
+
+      )\r
+
+      SELECT\r
+
+      \    ROUND(SUM(opportunity_revenue), 2) AS total_opportunity_revenue,\r
+
+      \    ROUND(SUM(CASE WHEN stage = 'Closed Won' THEN opportunity_revenue
+      ELSE 0 END), 2) AS won_revenue,\r
+
+      \    ROUND(SUM(CASE WHEN stage = 'Closed Lost' THEN opportunity_revenue
+      ELSE 0 END), 2) AS lost_revenue\r
+
+      FROM opportunity_revenue;\r
+
       \r
 
       -- Average won opportunity value\r
 
-      -- Your query here."
+      -- Your query here.\r
+
+      WITH opportunity_revenue AS (\r
+
+      \    SELECT\r
+
+      \        o.opportunity_id,\r
+
+      \        o.stage,\r
+
+      \        SUM(oli.quantity * p.price) AS opportunity_revenue\r
+
+      \    FROM DATABASE_FUNDAMENTALS.OPPORTUNITY o\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.OPPORTUNITY_LINE_ITEM oli\r
+
+      \        ON o.opportunity_id = oli.opportunity_id\r
+
+      \    JOIN DATABASE_FUNDAMENTALS.PRODUCT p\r
+
+      \        ON oli.product_id = p.product_id\r
+
+      \    WHERE o.stage IN ('Closed Won', 'Closed Lost')\r
+
+      \    GROUP BY\r
+
+      \        o.opportunity_id,\r
+
+      \        o.stage\r
+
+      )\r
+
+      SELECT\r
+
+      \    COUNT(*) AS won_opportunities,\r
+
+      \    ROUND(AVG(opportunity_revenue), 2) AS avg_won_opportunity_value\r
+
+      FROM opportunity_revenue\r
+
+      WHERE stage = 'Closed Won';"
     languageId: oracle-sql
   - kind: 1
     value: "<small>\r
