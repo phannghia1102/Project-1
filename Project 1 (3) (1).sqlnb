@@ -1128,15 +1128,19 @@ cells:
 
       <b>Executive summary</b><br>\r
 
-      Across 500,000 historical completed opportunities, the company achieved an
-      overall baseline win rate of approximately 50%, with performance
-      distributed evenly across major customer industries and regions.
-      Diagnostic analysis reveals that while macroeconomic account traits show
-      limited variance, deal velocity (sales-cycle duration) and product-mix
-      strategies exert a substantial influence on successful outcomes. Sales
-      leadership should focus on pipeline velocity monitoring, targeted
-      intervention in stalled deals, and promoting multi-product bundling to
-      maximize revenue generation.\r
+      \r
+
+      Across 500,000 completed historical opportunities, the company achieved an
+      overall win rate of approximately 50%. Historical win rates varied very
+      little across customer industries, opportunity types, individual products,
+      and single- versus multi-product opportunities. Completed sales-cycle
+      durations were also nearly identical across opportunity types and between
+      single- and multi-product opportunities. Overall, the dimensions examined
+      did not reveal substantial differences in historical sales outcomes,
+      suggesting that sales leadership should investigate other factors to
+      identify more meaningful sources of performance variation.\r
+
+      \r
 
       </small>"
     languageId: markdown
@@ -1145,17 +1149,21 @@ cells:
 
       <b>Recommendation 1</b><br>\r
 
-      <b>Finding:</b> Win rates remain stable across major industries, but
-      overall opportunity volumes concentrate heavily in Technology and Retail
-      sectors.<br>\r
+      \r
 
-      <b>Evidence:</b> Technology accounts generated 131,544 opportunities
-      (50.0% win rate) and Retail accounted for 127,189 opportunities (49.7% win
-      rate).<br>\r
+      <b>Finding:</b> Historical win rates were very similar across customer
+      industries.<br>\r
 
-      <b>Recommended action:</b> Maintain balanced account management while
-      tailoring specialized value propositions for high-volume sectors like
-      Technology and Retail to lift conversion ceilings.\r
+      <b>Evidence:</b> Industry-level win rates ranged from approximately 49.7%
+      to 50.2%, indicating little variation in win outcomes across the five
+      industries analyzed.<br>\r
+
+      <b>Recommended action:</b> Sales leadership should avoid assuming that
+      customer industry alone is a major differentiator of win performance and
+      should investigate more detailed customer or opportunity characteristics
+      when evaluating differences in sales outcomes.\r
+
+      \r
 
       </small>"
     languageId: markdown
@@ -1164,17 +1172,23 @@ cells:
 
       <b>Recommendation 2</b><br>\r
 
-      <b>Finding:</b> Completed sales-cycle duration differs meaningfully
-      between won and lost deals, highlighting deal velocity as a core predictor
-      of success.<br>\r
+      \r
 
-      <b>Evidence:</b> Successfully won opportunities historically closed within
-      a shorter median duration compared to prolonged deals resulting in
-      closed-lost outcomes.<br>\r
+      <b>Finding:</b> Opportunity type showed little difference in either
+      historical win rate or completed sales-cycle duration.<br>\r
 
-      <b>Recommended action:</b> Implement early-stage pipeline milestone
-      tracking to flag stalled opportunities and prompt sales rep intervention
-      before deals mirror historical lost profiles.\r
+      <b>Evidence:</b> Win rates across New Business, New from Existing,
+      Renewal, and Upsell opportunities ranged from 49.83% to 50.01%, while
+      median completed sales-cycle duration ranged from only 380 to 381
+      days.<br>\r
+
+      <b>Recommended action:</b> Sales leadership should not assume that
+      opportunity type alone requires substantially different expectations for
+      win probability or sales-cycle length. Other dimensions, such as customer
+      characteristics, opportunity value, or sales organization performance,
+      should be investigated for more meaningful differences.\r
+
+      \r
 
       </small>"
     languageId: markdown
@@ -1183,15 +1197,23 @@ cells:
 
       <b>Recommendation 3</b><br>\r
 
-      <b>Finding:</b> Multi-product opportunities yield higher total revenue and
-      larger deal sizes compared to single-product transactions.<br>\r
+      \r
 
-      <b>Evidence:</b> Bundling multiple products within a single opportunity
-      line item increases aggregate deal value across completed sales.<br>\r
+      <b>Finding:</b> Product presence and the number of products included in an
+      opportunity showed little difference in historical win outcomes.<br>\r
 
-      <b>Recommended action:</b> Train sales teams to actively cross-sell
-      complementary catalog items early in the sales cycle to increase average
-      opportunity value.\r
+      <b>Evidence:</b> Individual product win rates remained close to 50%, while
+      multi-product opportunities had a 49.96% win rate compared with 49.84% for
+      single-product opportunities. Median completed sales-cycle duration was
+      also nearly identical at 381 and 380 days, respectively.<br>\r
+
+      <b>Recommended action:</b> Sales leadership should not promote specific
+      products or multi-product selling solely as a method for improving win
+      rates. Product strategy should instead be evaluated alongside other
+      measures, such as opportunity value and customer characteristics, before
+      drawing conclusions about which product approaches are most effective.\r
+
+      \r
 
       </small>"
     languageId: markdown
@@ -1200,9 +1222,14 @@ cells:
 
       <b>What the data does not establish</b><br>\r
 
-      The historical data does not establish direct causality between individual
-      sales rep behaviors, specific marketing campaigns, and deal outcomes, as
-      external competitive factors and pricing discounts remain uncaptured.\r
+      The historical data identifies associations rather than causal
+      relationships, so differences in industry, opportunity type, product
+      presence, or product count cannot be interpreted as causing win or loss
+      outcomes. The dataset also does not capture all potentially relevant
+      factors, including competitive conditions, negotiated discounts, marketing
+      activity, and individual sales-rep behavior. Calculated revenue is based
+      on quantity × catalog price and should not be interpreted as recognized or
+      discount-adjusted revenue.\r
 
       </small>"
     languageId: markdown
