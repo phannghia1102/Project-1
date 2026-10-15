@@ -183,7 +183,7 @@ cells:
       ultimate business question of: \"how much benefit is there from
       product-mix\"<br>\r
 
-      <b>Tableau workbook sheet name:</b> Single vs Multi-product Outcomes\r
+      <b>Tableau workbook sheet name:</b> Single vs Multi-Product Outcomes\r
 
       </small>"
     languageId: markdown
@@ -1060,9 +1060,10 @@ cells:
 
       <b>Relevant KPI or comparison:</b> Win rate percentage and median
       completed sales-cycle duration compared across different opportunity
-      types..<br>\r
+      types.<br>\r
 
-      <b>Tableau workbook sheet name(s):</b> Win_Rate_By_Opportunity_Type<br>\r
+      <b>Tableau workbook sheet name(s):</b> Win Rate by Opportunity Type &
+      Median Cycle by Opportunity Type<br>\r
 
       <b>Key finding:</b> All four opportunity types have win rates of
       approximately 50% and very similar median completed sales-cycle durations.
@@ -1096,7 +1097,7 @@ cells:
       <b>Relevant KPI or comparison:</b> Product presence count and total
       quantity sold, compared between won and lost opportunity subsets.<br>\r
 
-      <b>Tableau workbook sheet name(s):</b> Product_Mix_Won_vs_Lost<br>\r
+      <b>Tableau workbook sheet name(s):</b> Product Win Rate<br>\r
 
       <b>Key finding:</b> Individual products appear at nearly identical
       frequencies across both won and lost opportunities. Win rates remain close
